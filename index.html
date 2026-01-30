@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="UTF-8">
+    <title>Untitled</title>
+    
+
+  </head>
+    
+  <body>
+  <!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jeu de Multiplication</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    height: 100vh;
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+#top {
+    position: absolute;
+    top: 15px;
+    width: 100%;
+    display: none;
+    justify-content: space-between;
+    padding: 0 20px;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.screen {
+    display: none;
+    max-width: 90%;
+}
+
+#game {
+    font-size: 48px;
+}
+
+#answer {
+    font-size: 48px;
+    width: 140px;
+    border: none;
+    border-bottom: 3px solid black;
+    background: transparent;
+    text-align: center;
+    outline: none;
+}
+
+input, select {
+    font-size: 18px;
+    padding: 8px;
+    margin: 8px;
+}
+
+button {
+    margin-top: 20px;
+    padding: 14px 30px;
+    font-size: 22px;
+    border: none;
+    border-radius: 10px;
+    background: black;
+    color: white;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #f9f9f9;
+    margin-top: 15px;
+}
+
+th, td {
+    border: 1px solid #ccc;
+    padding: 8px;
+}
+
+.good { color: green; }
+.bad { color: red; }
+</style>
+</head>
+
+<body>
+
+<!-- BARRE HAUTE -->
+<div id="top">
+    <div id="timer">⏱ 120 s</div>
+    <div id="score">⭐ 0</div>
+</div>
+
+<!-- ÉCRAN D'ACCUEIL -->
+<div id="startScreen" class="screen">
+    <h1>🧠 Jeu de Multiplication</h1>
+    <select id="difficulty">
+        <option value="easy">Facile (1 à 5)</option>
+        <option value="medium">Moyen (6 à 8)</option>
+        <option value="hard">Difficile (9 à 15)</option>
+    </select>
+    <br>
+    <button id="startBtn">▶️ Commencer</button>
+</div>
+
+<!-- ÉCRAN DE JEU -->
+<div id="gameScreen" class="screen">
+    <div id="game">
+        <span id="question"></span>
+        <input id="answer" type="tel" inputmode="numeric" pattern="[0-9]*">
+    </div>
+</div>
+
+<!-- ÉCRAN DE FIN -->
+<div id="endScreen" class="screen">
+    <h2 id="finalScore"></h2>
+
+    <div id="saveZone">
+        <input id="playerName" placeholder="Prénom">
+        <br>
+        <button id="saveBtn">💾 Enregistrer le score</button>
+    </div>
+
+    <div id="savedMessage" style="display:none; font-size:20px; margin-top:10px;">
+        🎉 Bravo, ton score est enregistré !
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Prénom</th>
+                <th>Score</th>
+                <th>Niveau</th>
+                <th>Date</th>
+            </tr>
+        </thead>
+        <tbody id="scoreTable"></tbody>
+    </table>
+
+    <button id="restartBtn">🔁 Recommencer</button>
+</div>
+
+<script>
+let score = 0;
+let timeLeft = 120;
+let a = 0, b = 0;
+let timer = null;
+let resultLength = 0;
+let scoreSaved = false;
+
+// Elements
+const topBar = document.getElementById("top");
+const startScreen = document.getElementById("startScreen");
+const gameScreen = document.getElementById("gameScreen");
+const endScreen = document.getElementById("endScreen");
+
+const questionEl = document.getElementById("question");
+const answerEl = document.getElementById("answer");
+const scoreEl = document.getElementById("score");
+const timerEl = document.getElementById("timer");
+const difficultyEl = document.getElementById("difficulty");
+const finalScoreEl = document.getElementById("finalScore");
+const nameEl = document.getElementById("playerName");
+const tableEl = document.getElementById("scoreTable");
+const saveZone = document.getElementById("saveZone");
+const savedMessage = document.getElementById("savedMessage");
+
+// Buttons
+document.getElementById("startBtn").onclick = startGame;
+document.getElementById("saveBtn").onclick = saveScore;
+document.getElementById("restartBtn").onclick = goHome;
+
+function show(screen) {
+    startScreen.style.display = "none";
+    gameScreen.style.display = "none";
+    endScreen.style.display = "none";
+    screen.style.display = "block";
+}
+
+function getRange() {
+    if (difficultyEl.value === "easy") return [1, 5];
+    if (difficultyEl.value === "medium") return [6, 8];
+    return [9, 15];
+}
+
+function newQuestion() {
+    const [min, max] = getRange();
+    a = Math.floor(Math.random() * (max - min + 1)) + min;
+    b = Math.floor(Math.random() * (max - min + 1)) + min;
+    resultLength = (a * b).toString().length;
+    questionEl.textContent = `${a} × ${b} = `;
+    questionEl.className = "";
+    answerEl.value = "";
+    answerEl.focus();
+}
+
+function startGame() {
+    score = 0;
+    timeLeft = 120;
+    scoreSaved = false;
+
+    scoreEl.textContent = "⭐ 0";
+    timerEl.textContent = "⏱ 120 s";
+
+    saveZone.style.display = "block";
+    savedMessage.style.display = "none";
+
+    topBar.style.display = "flex";
+    show(gameScreen);
+    newQuestion();
+
+    clearInterval(timer);
+    timer = setInterval(() => {
+        timeLeft--;
+        timerEl.textContent = `⏱ ${timeLeft} s`;
+        if (timeLeft <= 0) endGame();
+    }, 1000);
+}
+
+function endGame() {
+    clearInterval(timer);
+    topBar.style.display = "none";
+    finalScoreEl.textContent = `🎉 Score : ${score}`;
+    show(endScreen);
+    renderTable();
+}
+
+function saveScore() {
+    if (scoreSaved) return;
+    if (!nameEl.value) {
+        alert("Entre ton prénom 🙂");
+        return;
+    }
+
+    let scores = JSON.parse(localStorage.getItem("scores") || "[]");
+    const existing = scores.find(s => s.name === nameEl.value);
+
+    if (existing) {
+        if (score > existing.score) {
+            existing.score = score;
+            existing.level = difficultyEl.value;
+            existing.date = new Date().toLocaleDateString();
+        }
+    } else {
+        scores.push({
+            name: nameEl.value,
+            score: score,
+            level: difficultyEl.value,
+            date: new Date().toLocaleDateString()
+        });
+    }
+
+    localStorage.setItem("scores", JSON.stringify(scores));
+
+    scoreSaved = true;
+    saveZone.style.display = "none";
+    savedMessage.style.display = "block";
+    nameEl.value = "";
+
+    renderTable();
+}
+
+function renderTable() {
+    let scores = JSON.parse(localStorage.getItem("scores") || "[]");
+    scores.sort((a, b) => b.score - a.score);
+
+    tableEl.innerHTML = "";
+    scores.forEach((s, index) => {
+        let medal = index === 0 ? "🥇" :
+                    index === 1 ? "🥈" :
+                    index === 2 ? "🥉" : index + 1;
+
+        tableEl.innerHTML += `
+            <tr>
+                <td>${medal}</td>
+                <td>${s.name}</td>
+                <td>${s.score}</td>
+                <td>${s.level}</td>
+                <td>${s.date}</td>
+            </tr>
+        `;
+    });
+}
+
+function goHome() {
+    show(startScreen);
+}
+
+answerEl.addEventListener("input", () => {
+    if (answerEl.value.length < resultLength) return;
+
+    const value = Number(answerEl.value);
+    if (value === a * b) {
+        questionEl.className = "good";
+        score++;
+        scoreEl.textContent = `⭐ ${score}`;
+        setTimeout(newQuestion, 300);
+    } else {
+        questionEl.className = "bad";
+        if (navigator.vibrate) navigator.vibrate(200);
+        answerEl.value = "";
+    }
+});
+
+// INIT
+show(startScreen);
+renderTable();
+</script>
+
+</body>
+</html>
+    
+  </body>
+  
+</html>
