@@ -7,54 +7,52 @@
 
 <style>
 
-/* ===== FOND TABLEAU NOIR ===== */
+/* ===== FOND STABLE MOBILE ===== */
 body {
     margin: 0;
     font-family: 'Arial Rounded MT Bold', 'Comic Sans MS', Arial, sans-serif;
-    height: 100vh;
+    min-height: 100vh;
     background:
         linear-gradient(rgba(0,0,0,0.25), rgba(0,0,0,0.25)),
-        url("background.png") center / cover no-repeat fixed;
+        url("background.png") center center / cover no-repeat;
+    background-attachment: scroll;
     display: flex;
     justify-content: center;
     align-items: flex-start;
-    padding-top: 140px;
+    padding-top: 120px;
     text-align: center;
 }
 
-/* ===== BARRE HAUTE ===== */
-#top {
-    position: absolute;
-    top: 80px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 85%;
-    max-width: 420px;
-    display: none;
-    justify-content: space-between;
-    padding: 10px 16px;
-    font-size: 18px;
-    font-weight: bold;
-    color: #f5f5f5;
-    background: rgba(0,0,0,0.25);
-    border-radius: 14px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+/* fond fixe uniquement desktop */
+@media (min-width: 768px) {
+    body {
+        background-attachment: fixed;
+    }
 }
 
-/* ===== ÉCRANS ===== */
+/* ===== CARTE JEU ===== */
 .screen {
     display: none;
-    max-width: 90%;
+    max-width: 92%;
     background: rgba(0,0,0,0.35);
     backdrop-filter: blur(2px);
     border-radius: 18px;
-    padding: 28px 32px;
+    padding: 24px 22px;
     box-shadow: 0 8px 25px rgba(0,0,0,0.4);
     color: #f5f5f5;
 }
 
-/* ===== TEXTE EFFET CRAIE ===== */
-h1, h2, #game, #question, #finalScore {
+/* ===== HEADER DANS LE CADRE ===== */
+.game-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 14px;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+/* ===== TEXTE CRAIE ===== */
+h1, h2, #game {
     color: #f5f5f5;
     text-shadow:
         1px 1px 0 rgba(255,255,255,0.15),
@@ -63,20 +61,20 @@ h1, h2, #game, #question, #finalScore {
 
 /* ===== JEU ===== */
 #game {
-    font-size: 52px;
+    font-size: 44px;
     letter-spacing: 2px;
 }
 
-/* ===== RÉPONSE STYLE CRAIE ===== */
+/* ===== INPUT ===== */
 #answer {
-    font-size: 52px;
-    width: 140px;
+    font-size: 44px;
+    width: 120px;
     border: none;
     border-bottom: 3px dashed #f5f5f5;
     background: transparent;
+    color: #f5f5f5;
     text-align: center;
     outline: none;
-    color: #f5f5f5;
 }
 
 /* ===== FORM ===== */
@@ -90,23 +88,23 @@ input, select {
 
 /* ===== BOUTONS ===== */
 button {
-    margin-top: 20px;
-    padding: 14px 30px;
-    font-size: 22px;
+    margin-top: 18px;
+    padding: 12px 26px;
+    font-size: 20px;
     border: none;
     border-radius: 10px;
     background: #2c3e50;
     color: white;
 }
 
-/* ===== TABLEAU SCORES ===== */
+/* ===== TABLE SCORES ===== */
 table {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 15px;
+    margin-top: 14px;
     background: rgba(0,0,0,0.65);
     color: #f5f5f5;
-    border-radius: 14px;
+    border-radius: 12px;
     overflow: hidden;
 }
 
@@ -115,53 +113,22 @@ th {
 }
 
 th, td {
-    padding: 10px;
+    padding: 8px;
     border-bottom: 1px solid rgba(255,255,255,0.2);
 }
 
-.good { color: #2ecc71; }
-.bad { color: #e74c3c; }
+/* ===== BON / FAUX ===== */
+.good { color: #2ecc71 !important; }
+.bad  { color: #e74c3c !important; }
 
 /* ===== ANIMATION CRAIE ===== */
 @keyframes chalkWrite {
-    from {
-        opacity: 0;
-        transform: translateY(6px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
 }
 
-.chalk-animate {
-    animation: chalkWrite 0.35s ease-out;
-}
-
-/* ===== AJUSTEMENTS MOBILE ===== */
-@media (max-width: 600px) {
-
-    body {
-        padding-top: 110px;
-    }
-
-    #game {
-        font-size: 44px;
-    }
-
-    #answer {
-        font-size: 44px;
-        width: 120px;
-    }
-
-    .screen {
-        padding: 22px 20px;
-        max-width: 92%;
-    }
-
-    table {
-        font-size: 16px;
-    }
+.chalk {
+    animation: chalkWrite 0.3s ease-out;
 }
 
 </style>
@@ -169,229 +136,143 @@ th, td {
 
 <body>
 
-<!-- BARRE HAUTE -->
-<div id="top">
-    <div id="timer">⏱ 120 s</div>
-    <div id="score">⭐ 0</div>
-</div>
-
-<!-- ÉCRAN D'ACCUEIL -->
+<!-- ACCUEIL -->
 <div id="startScreen" class="screen">
-    <h1>🧠 Jeu de Multiplication</h1>
+    <h1>🧠 Multiplications</h1>
     <select id="difficulty">
         <option value="easy">Facile (1 à 5)</option>
         <option value="medium">Moyen (6 à 8)</option>
         <option value="hard">Difficile (9 à 15)</option>
     </select>
     <br>
-    <button id="startBtn">▶️ Commencer</button>
+    <button onclick="startGame()">▶️ Commencer</button>
 </div>
 
-<!-- ÉCRAN DE JEU -->
+<!-- JEU -->
 <div id="gameScreen" class="screen">
+    <div class="game-header">
+        <span id="timer">⏱ 120 s</span>
+        <span id="score">⭐ 0</span>
+    </div>
+
     <div id="game">
         <span id="question"></span>
-        <input id="answer" type="tel" inputmode="numeric" pattern="[0-9]*">
+        <input id="answer" type="tel" inputmode="numeric">
     </div>
 </div>
 
-<!-- ÉCRAN DE FIN -->
+<!-- FIN -->
 <div id="endScreen" class="screen">
     <h2 id="finalScore"></h2>
 
-    <div id="saveZone">
-        <input id="playerName" placeholder="Prénom">
-        <br>
-        <button id="saveBtn">💾 Enregistrer le score</button>
-    </div>
-
-    <div id="savedMessage" style="display:none; font-size:20px; margin-top:10px;">
-        🎉 Bravo, ton score est enregistré !
-    </div>
+    <input id="playerName" placeholder="Prénom">
+    <br>
+    <button onclick="saveScore()">💾 Enregistrer</button>
 
     <table>
         <thead>
-            <tr>
-                <th>#</th>
-                <th>Prénom</th>
-                <th>Score</th>
-                <th>Niveau</th>
-                <th>Date</th>
-            </tr>
+            <tr><th>#</th><th>Prénom</th><th>Score</th></tr>
         </thead>
         <tbody id="scoreTable"></tbody>
     </table>
 
-    <button id="restartBtn">🔁 Recommencer</button>
+    <button onclick="show(startScreen)">🔁 Rejouer</button>
 </div>
 
 <script>
-let score = 0;
-let timeLeft = 120;
-let a = 0, b = 0;
-let timer = null;
-let resultLength = 0;
-let scoreSaved = false;
+let score=0,time=120,a,b,len,timer;
 
-const topBar = document.getElementById("top");
-const startScreen = document.getElementById("startScreen");
-const gameScreen = document.getElementById("gameScreen");
-const endScreen = document.getElementById("endScreen");
+const startScreen=document.getElementById("startScreen");
+const gameScreen=document.getElementById("gameScreen");
+const endScreen=document.getElementById("endScreen");
+const q=document.getElementById("question");
+const ans=document.getElementById("answer");
+const s=document.getElementById("score");
+const t=document.getElementById("timer");
+const fs=document.getElementById("finalScore");
+const table=document.getElementById("scoreTable");
 
-const questionEl = document.getElementById("question");
-const answerEl = document.getElementById("answer");
-const scoreEl = document.getElementById("score");
-const timerEl = document.getElementById("timer");
-const difficultyEl = document.getElementById("difficulty");
-const finalScoreEl = document.getElementById("finalScore");
-const nameEl = document.getElementById("playerName");
-const tableEl = document.getElementById("scoreTable");
-const saveZone = document.getElementById("saveZone");
-const savedMessage = document.getElementById("savedMessage");
-
-document.getElementById("startBtn").onclick = startGame;
-document.getElementById("saveBtn").onclick = saveScore;
-document.getElementById("restartBtn").onclick = goHome;
-
-function show(screen) {
-    startScreen.style.display = "none";
-    gameScreen.style.display = "none";
-    endScreen.style.display = "none";
-    screen.style.display = "block";
+function show(el){
+    startScreen.style.display="none";
+    gameScreen.style.display="none";
+    endScreen.style.display="none";
+    el.style.display="block";
 }
 
-function getRange() {
-    if (difficultyEl.value === "easy") return [1, 5];
-    if (difficultyEl.value === "medium") return [6, 8];
-    return [9, 15];
+function range(){
+    return difficulty.value==="easy"?[1,5]:
+           difficulty.value==="medium"?[6,8]:[9,15];
 }
 
-function newQuestion() {
-    const [min, max] = getRange();
-    a = Math.floor(Math.random() * (max - min + 1)) + min;
-    b = Math.floor(Math.random() * (max - min + 1)) + min;
-    resultLength = (a * b).toString().length;
-
-    questionEl.textContent = `${a} × ${b} = `;
-    questionEl.classList.remove("chalk-animate");
-    void questionEl.offsetWidth;
-    questionEl.classList.add("chalk-animate");
-
-    questionEl.className = "chalk-animate";
-    answerEl.value = "";
-    answerEl.focus();
+function newQ(){
+    let [min,max]=range();
+    a=Math.floor(Math.random()*(max-min+1))+min;
+    b=Math.floor(Math.random()*(max-min+1))+min;
+    len=(a*b).toString().length;
+    q.textContent=`${a} × ${b} = `;
+    q.className="chalk";
+    ans.value="";
+    ans.focus();
 }
 
-function startGame() {
-    score = 0;
-    timeLeft = 120;
-    scoreSaved = false;
-
-    scoreEl.textContent = "⭐ 0";
-    timerEl.textContent = "⏱ 120 s";
-
-    saveZone.style.display = "block";
-    savedMessage.style.display = "none";
-
-    topBar.style.display = "flex";
+function startGame(){
+    score=0; time=120;
+    s.textContent="⭐ 0";
+    t.textContent="⏱ 120 s";
     show(gameScreen);
-    newQuestion();
-
+    newQ();
     clearInterval(timer);
-    timer = setInterval(() => {
-        timeLeft--;
-        timerEl.textContent = `⏱ ${timeLeft} s`;
-        if (timeLeft <= 0) endGame();
-    }, 1000);
+    timer=setInterval(()=>{
+        time--;
+        t.textContent=`⏱ ${time} s`;
+        if(time<=0) endGame();
+    },1000);
 }
 
-function endGame() {
+function endGame(){
     clearInterval(timer);
-    topBar.style.display = "none";
-    finalScoreEl.textContent = `🎉 Score : ${score}`;
+    fs.textContent=`🎉 Score : ${score}`;
     show(endScreen);
-    renderTable();
+    render();
 }
 
-function saveScore() {
-    if (scoreSaved) return;
-    if (!nameEl.value) {
-        alert("Entre ton prénom 🙂");
-        return;
-    }
-
-    let scores = JSON.parse(localStorage.getItem("scores") || "[]");
-    const existing = scores.find(s => s.name === nameEl.value);
-
-    if (existing) {
-        if (score > existing.score) {
-            existing.score = score;
-            existing.level = difficultyEl.value;
-            existing.date = new Date().toLocaleDateString();
-        }
-    } else {
-        scores.push({
-            name: nameEl.value,
-            score,
-            level: difficultyEl.value,
-            date: new Date().toLocaleDateString()
-        });
-    }
-
-    localStorage.setItem("scores", JSON.stringify(scores));
-
-    scoreSaved = true;
-    saveZone.style.display = "none";
-    savedMessage.style.display = "block";
-    nameEl.value = "";
-
-    renderTable();
-}
-
-function renderTable() {
-    let scores = JSON.parse(localStorage.getItem("scores") || "[]");
-    scores.sort((a, b) => b.score - a.score);
-
-    tableEl.innerHTML = "";
-    scores.forEach((s, index) => {
-        let medal = index === 0 ? "🥇" :
-                    index === 1 ? "🥈" :
-                    index === 2 ? "🥉" : index + 1;
-
-        tableEl.innerHTML += `
-            <tr>
-                <td>${medal}</td>
-                <td>${s.name}</td>
-                <td>${s.score}</td>
-                <td>${s.level}</td>
-                <td>${s.date}</td>
-            </tr>
-        `;
-    });
-}
-
-function goHome() {
-    show(startScreen);
-}
-
-answerEl.addEventListener("input", () => {
-    if (answerEl.value.length < resultLength) return;
-
-    const value = Number(answerEl.value);
-    if (value === a * b) {
-        questionEl.className = "good";
+ans.addEventListener("input",()=>{
+    if(ans.value.length<len) return;
+    if(+ans.value===a*b){
+        q.className="good";
         score++;
-        scoreEl.textContent = `⭐ ${score}`;
-        setTimeout(newQuestion, 300);
+        s.textContent=`⭐ ${score}`;
+        setTimeout(newQ,250);
     } else {
-        questionEl.className = "bad";
-        if (navigator.vibrate) navigator.vibrate(200);
-        answerEl.value = "";
+        q.className="bad";
+        navigator.vibrate?.(200);
+        ans.value="";
     }
 });
 
+function saveScore(){
+    if(!playerName.value) return alert("Prénom ?");
+    let data=JSON.parse(localStorage.getItem("scores")||"[]");
+    let e=data.find(x=>x.name===playerName.value);
+    if(!e||score>e.score){
+        if(e) e.score=score;
+        else data.push({name:playerName.value,score});
+    }
+    localStorage.setItem("scores",JSON.stringify(data));
+    render();
+}
+
+function render(){
+    let data=JSON.parse(localStorage.getItem("scores")||"[]");
+    data.sort((a,b)=>b.score-a.score);
+    table.innerHTML="";
+    data.forEach((x,i)=>{
+        table.innerHTML+=`<tr><td>${i<3?["🥇","🥈","🥉"][i]:i+1}</td><td>${x.name}</td><td>${x.score}</td></tr>`;
+    });
+}
+
 show(startScreen);
-renderTable();
+render();
 </script>
 
 </body>
