@@ -6,8 +6,6 @@
 <title>Jeu de Multiplication</title>
 
 <style>
-
-/* ===== FOND STABLE MOBILE ===== */
 body {
     margin: 0;
     font-family: 'Arial Rounded MT Bold', 'Comic Sans MS', Arial, sans-serif;
@@ -23,14 +21,10 @@ body {
     text-align: center;
 }
 
-/* fond fixe uniquement desktop */
 @media (min-width: 768px) {
-    body {
-        background-attachment: fixed;
-    }
+    body { background-attachment: fixed; }
 }
 
-/* ===== CARTE JEU ===== */
 .screen {
     display: none;
     max-width: 92%;
@@ -42,7 +36,6 @@ body {
     color: #f5f5f5;
 }
 
-/* ===== HEADER DANS LE CADRE ===== */
 .game-header {
     display: flex;
     justify-content: space-between;
@@ -51,7 +44,6 @@ body {
     font-weight: bold;
 }
 
-/* ===== TEXTE CRAIE ===== */
 h1, h2, #game {
     color: #f5f5f5;
     text-shadow:
@@ -59,13 +51,11 @@ h1, h2, #game {
         -1px -1px 0 rgba(255,255,255,0.1);
 }
 
-/* ===== JEU ===== */
 #game {
     font-size: 44px;
     letter-spacing: 2px;
 }
 
-/* ===== INPUT ===== */
 #answer {
     font-size: 44px;
     width: 120px;
@@ -77,7 +67,6 @@ h1, h2, #game {
     outline: none;
 }
 
-/* ===== FORM ===== */
 input, select {
     font-size: 18px;
     padding: 8px;
@@ -86,7 +75,6 @@ input, select {
     border: none;
 }
 
-/* ===== BOUTONS ===== */
 button {
     margin-top: 18px;
     padding: 12px 26px;
@@ -97,7 +85,6 @@ button {
     color: white;
 }
 
-/* ===== TABLE SCORES ===== */
 table {
     width: 100%;
     border-collapse: collapse;
@@ -117,20 +104,15 @@ th, td {
     border-bottom: 1px solid rgba(255,255,255,0.2);
 }
 
-/* ===== BON / FAUX ===== */
 .good { color: #2ecc71 !important; }
 .bad  { color: #e74c3c !important; }
 
-/* ===== ANIMATION CRAIE ===== */
 @keyframes chalkWrite {
     from { opacity: 0; transform: translateY(6px); }
     to   { opacity: 1; transform: translateY(0); }
 }
 
-.chalk {
-    animation: chalkWrite 0.3s ease-out;
-}
-
+.chalk { animation: chalkWrite 0.3s ease-out; }
 </style>
 </head>
 
@@ -165,9 +147,17 @@ th, td {
 <div id="endScreen" class="screen">
     <h2 id="finalScore"></h2>
 
-    <input id="playerName" placeholder="Prénom">
-    <br>
-    <button onclick="saveScore()">💾 Enregistrer</button>
+    <!-- ZONE SAUVEGARDE -->
+    <div id="saveZone">
+        <input id="playerName" placeholder="Prénom">
+        <br>
+        <button onclick="saveScore()">💾 Enregistrer</button>
+    </div>
+
+    <!-- MESSAGE CONFIRMATION -->
+    <div id="savedMsg" style="display:none; margin-top:10px; font-size:18px;">
+        🎉 Bravo, ton score est enregistré !
+    </div>
 
     <table>
         <thead>
@@ -180,7 +170,7 @@ th, td {
 </div>
 
 <script>
-let score=0,time=120,a,b,len,timer;
+let score=0,time=120,a,b,len,timer,scoreSaved=false;
 
 const startScreen=document.getElementById("startScreen");
 const gameScreen=document.getElementById("gameScreen");
@@ -191,6 +181,8 @@ const s=document.getElementById("score");
 const t=document.getElementById("timer");
 const fs=document.getElementById("finalScore");
 const table=document.getElementById("scoreTable");
+const saveZone=document.getElementById("saveZone");
+const savedMsg=document.getElementById("savedMsg");
 
 function show(el){
     startScreen.style.display="none";
@@ -216,9 +208,11 @@ function newQ(){
 }
 
 function startGame(){
-    score=0; time=120;
+    score=0; time=120; scoreSaved=false;
     s.textContent="⭐ 0";
     t.textContent="⏱ 120 s";
+    saveZone.style.display="block";
+    savedMsg.style.display="none";
     show(gameScreen);
     newQ();
     clearInterval(timer);
@@ -251,14 +245,14 @@ ans.addEventListener("input",()=>{
 });
 
 function saveScore(){
+    if(scoreSaved) return;
     if(!playerName.value) return alert("Prénom ?");
     let data=JSON.parse(localStorage.getItem("scores")||"[]");
-    let e=data.find(x=>x.name===playerName.value);
-    if(!e||score>e.score){
-        if(e) e.score=score;
-        else data.push({name:playerName.value,score});
-    }
+    data.push({name:playerName.value,score});
     localStorage.setItem("scores",JSON.stringify(data));
+    scoreSaved=true;
+    saveZone.style.display="none";
+    savedMsg.style.display="block";
     render();
 }
 
