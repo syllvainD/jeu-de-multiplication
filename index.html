@@ -5,6 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Jeu de Multiplication</title>
 
+<!-- === AJOUT PWA (ÉTAPE 3) === -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#1c2833">
+<!-- =========================== -->
+
 <style>
 body {
     margin: 0;
@@ -147,14 +152,12 @@ th, td {
 <div id="endScreen" class="screen">
     <h2 id="finalScore"></h2>
 
-    <!-- ZONE SAUVEGARDE -->
     <div id="saveZone">
         <input id="playerName" placeholder="Prénom">
         <br>
         <button onclick="saveScore()">💾 Enregistrer</button>
     </div>
 
-    <!-- MESSAGE CONFIRMATION -->
     <div id="savedMsg" style="display:none; margin-top:10px; font-size:18px;">
         🎉 Bravo, ton score est enregistré !
     </div>
@@ -264,6 +267,12 @@ function render(){
         table.innerHTML+=`<tr><td>${i<3?["🥇","🥈","🥉"][i]:i+1}</td><td>${x.name}</td><td>${x.score}</td></tr>`;
     });
 }
+
+/* === ENREGISTREMENT SERVICE WORKER (HORS LIGNE) === */
+if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("service-worker.js");
+}
+/* ================================================= */
 
 show(startScreen);
 render();
