@@ -6,19 +6,19 @@
 <title>Jeu de Multiplication</title>
 
 <style>
-/* ===== FOND TABLEAU NOIR CARTOON ===== */
 body {
     margin: 0;
-    font-family: Arial, sans-serif;
+    font-family: 'Arial Rounded MT Bold', 'Comic Sans MS', Arial, sans-serif;
     height: 100vh;
-    background: #f2f2f2;
+    background:
+        linear-gradient(rgba(255,255,255,0.8), rgba(255,255,255,0.8)),
+        url("background.jpg") center / cover no-repeat fixed;
     display: flex;
     align-items: center;
     justify-content: center;
     text-align: center;
 }
 
-/* ===== BARRE HAUTE ===== */
 #top {
     position: absolute;
     top: 15px;
@@ -30,33 +30,25 @@ body {
     font-weight: bold;
 }
 
-/* ===== CARTES / ÉCRANS ===== */
 .screen {
     display: none;
-    background: white;
-    border-radius: 22px;
-    padding: 25px 30px;
-    box-shadow: 0 12px 35px rgba(0,0,0,0.25);
-    max-width: 95%;
+    max-width: 90%;
 }
 
-/* ===== JEU ===== */
 #game {
-    font-size: 52px;
-    letter-spacing: 2px;
+    font-size: 48px;
 }
 
 #answer {
-    font-size: 52px;
+    font-size: 48px;
     width: 140px;
     border: none;
-    border-bottom: 4px solid #2c3e50;
+    border-bottom: 3px solid black;
     background: transparent;
     text-align: center;
     outline: none;
 }
 
-/* ===== FORM ===== */
 input, select {
     font-size: 18px;
     padding: 8px;
@@ -69,34 +61,20 @@ button {
     font-size: 22px;
     border: none;
     border-radius: 10px;
-    background: #2c3e50;
+    background: black;
     color: white;
 }
 
-/* ===== TABLEAU SCORES ===== */
 table {
     width: 100%;
     border-collapse: collapse;
+    background: #f9f9f9;
     margin-top: 15px;
-    background: white;
-    border-radius: 14px;
-    overflow: hidden;
-    box-shadow: 0 6px 15px rgba(0,0,0,0.2);
-}
-
-th {
-    background: #2c3e50;
-    color: white;
-    font-size: 18px;
 }
 
 th, td {
-    padding: 10px;
-    text-align: center;
-}
-
-tr:nth-child(even) {
-    background: #f4f6f7;
+    border: 1px solid #ccc;
+    padding: 8px;
 }
 
 .good { color: green; }
@@ -170,6 +148,7 @@ let timer = null;
 let resultLength = 0;
 let scoreSaved = false;
 
+// Elements
 const topBar = document.getElementById("top");
 const startScreen = document.getElementById("startScreen");
 const gameScreen = document.getElementById("gameScreen");
@@ -186,6 +165,7 @@ const tableEl = document.getElementById("scoreTable");
 const saveZone = document.getElementById("saveZone");
 const savedMessage = document.getElementById("savedMessage");
 
+// Buttons
 document.getElementById("startBtn").onclick = startGame;
 document.getElementById("saveBtn").onclick = saveScore;
 document.getElementById("restartBtn").onclick = goHome;
@@ -264,7 +244,7 @@ function saveScore() {
     } else {
         scores.push({
             name: nameEl.value,
-            score,
+            score: score,
             level: difficultyEl.value,
             date: new Date().toLocaleDateString()
         });
@@ -281,4 +261,51 @@ function saveScore() {
 }
 
 function renderTable() {
-    let scores = JSON.parse(localStorage.getI
+    let scores = JSON.parse(localStorage.getItem("scores") || "[]");
+    scores.sort((a, b) => b.score - a.score);
+
+    tableEl.innerHTML = "";
+    scores.forEach((s, index) => {
+        let medal = index === 0 ? "🥇" :
+                    index === 1 ? "🥈" :
+                    index === 2 ? "🥉" : index + 1;
+
+        tableEl.innerHTML += `
+            <tr>
+                <td>${medal}</td>
+                <td>${s.name}</td>
+                <td>${s.score}</td>
+                <td>${s.level}</td>
+                <td>${s.date}</td>
+            </tr>
+        `;
+    });
+}
+
+function goHome() {
+    show(startScreen);
+}
+
+answerEl.addEventListener("input", () => {
+    if (answerEl.value.length < resultLength) return;
+
+    const value = Number(answerEl.value);
+    if (value === a * b) {
+        questionEl.className = "good";
+        score++;
+        scoreEl.textContent = `⭐ ${score}`;
+        setTimeout(newQuestion, 300);
+    } else {
+        questionEl.className = "bad";
+        if (navigator.vibrate) navigator.vibrate(200);
+        answerEl.value = "";
+    }
+});
+
+// INIT
+show(startScreen);
+renderTable();
+</script>
+
+</body>
+</html>
