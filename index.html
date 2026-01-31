@@ -246,4 +246,153 @@ const difficultyEl = document.getElementById("difficulty");
 const finalScoreEl = document.getElementById("finalScore");
 const nameEl = document.getElementById("playerName");
 const tableEl = document.getElementById("scoreTable");
-const saveZone = document
+const saveZone = document.getElementById("saveZone");
+const savedMessage = document.getElementById("savedMessage");
+
+document.getElementById("startBtn").onclick = startGame;
+document.getElementById("saveBtn").onclick = saveScore;
+document.getElementById("restartBtn").onclick = goHome;
+
+function show(screen) {
+    startScreen.style.display = "none";
+    gameScreen.style.display = "none";
+    endScreen.style.display = "none";
+    screen.style.display = "block";
+}
+
+function getRange() {
+    if (difficultyEl.value === "easy") return [1, 5];
+    if (difficultyEl.value === "medium") return [6, 8];
+    return [9, 15];
+}
+
+function newQuestion() {
+    const [min, max] = getRange();
+    a = Math.floor(Math.random() * (max - min + 1)) + min;
+    b = Math.floor(Math.random() * (max - min + 1)) + min;
+    resultLength = (a * b).toString().length;
+
+    questionEl.textContent = `${a} × ${b} = `;
+    questionEl.classList.remove("chalk-animate");
+    void questionEl.offsetWidth;
+    questionEl.classList.add("chalk-animate");
+
+    questionEl.className = "chalk-animate";
+    answerEl.value = "";
+    answerEl.focus();
+}
+
+function startGame() {
+    score = 0;
+    timeLeft = 120;
+    scoreSaved = false;
+
+    scoreEl.textContent = "⭐ 0";
+    timerEl.textContent = "⏱ 120 s";
+
+    saveZone.style.display = "block";
+    savedMessage.style.display = "none";
+
+    topBar.style.display = "flex";
+    show(gameScreen);
+    newQuestion();
+
+    clearInterval(timer);
+    timer = setInterval(() => {
+        timeLeft--;
+        timerEl.textContent = `⏱ ${timeLeft} s`;
+        if (timeLeft <= 0) endGame();
+    }, 1000);
+}
+
+function endGame() {
+    clearInterval(timer);
+    topBar.style.display = "none";
+    finalScoreEl.textContent = `🎉 Score : ${score}`;
+    show(endScreen);
+    renderTable();
+}
+
+function saveScore() {
+    if (scoreSaved) return;
+    if (!nameEl.value) {
+        alert("Entre ton prénom 🙂");
+        return;
+    }
+
+    let scores = JSON.parse(localStorage.getItem("scores") || "[]");
+    const existing = scores.find(s => s.name === nameEl.value);
+
+    if (existing) {
+        if (score > existing.score) {
+            existing.score = score;
+            existing.level = difficultyEl.value;
+            existing.date = new Date().toLocaleDateString();
+        }
+    } else {
+        scores.push({
+            name: nameEl.value,
+            score,
+            level: difficultyEl.value,
+            date: new Date().toLocaleDateString()
+        });
+    }
+
+    localStorage.setItem("scores", JSON.stringify(scores));
+
+    scoreSaved = true;
+    saveZone.style.display = "none";
+    savedMessage.style.display = "block";
+    nameEl.value = "";
+
+    renderTable();
+}
+
+function renderTable() {
+    let scores = JSON.parse(localStorage.getItem("scores") || "[]");
+    scores.sort((a, b) => b.score - a.score);
+
+    tableEl.innerHTML = "";
+    scores.forEach((s, index) => {
+        let medal = index === 0 ? "🥇" :
+                    index === 1 ? "🥈" :
+                    index === 2 ? "🥉" : index + 1;
+
+        tableEl.innerHTML += `
+            <tr>
+                <td>${medal}</td>
+                <td>${s.name}</td>
+                <td>${s.score}</td>
+                <td>${s.level}</td>
+                <td>${s.date}</td>
+            </tr>
+        `;
+    });
+}
+
+function goHome() {
+    show(startScreen);
+}
+
+answerEl.addEventListener("input", () => {
+    if (answerEl.value.length < resultLength) return;
+
+    const value = Number(answerEl.value);
+    if (value === a * b) {
+        questionEl.className = "good";
+        score++;
+        scoreEl.textContent = `⭐ ${score}`;
+        setTimeout(newQuestion, 300);
+    } else {
+        questionEl.className = "bad";
+        if (navigator.vibrate) navigator.vibrate(200);
+        answerEl.value = "";
+    }
+});
+
+show(startScreen);
+renderTable();
+</script>
+
+</body>
+</html>
