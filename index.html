@@ -6,6 +6,8 @@
 <title>Jeu de Multiplication</title>
 
 <style>
+
+/* ===== FOND TABLEAU NOIR ===== */
 body {
     margin: 0;
     font-family: 'Arial Rounded MT Bold', 'Comic Sans MS', Arial, sans-serif;
@@ -19,6 +21,7 @@ body {
     text-align: center;
 }
 
+/* ===== BARRE HAUTE ===== */
 #top {
     position: absolute;
     top: 15px;
@@ -26,71 +29,95 @@ body {
     display: none;
     justify-content: space-between;
     padding: 0 20px;
-    font-size: 20px;
+    font-size: 22px;
     font-weight: bold;
+    color: #f5f5f5;
+    text-shadow: 1px 1px 0 rgba(255,255,255,0.15);
 }
 
+/* ===== ÉCRANS ===== */
 .screen {
     display: none;
     max-width: 90%;
+    background: rgba(0,0,0,0.55);
+    border-radius: 22px;
+    padding: 25px 30px;
+    box-shadow: 0 12px 35px rgba(0,0,0,0.6);
+    color: #f5f5f5;
 }
 
+/* ===== TEXTE EFFET CRAIE ===== */
+h1, h2, #game, #question, #finalScore {
+    color: #f5f5f5;
+    text-shadow:
+        1px 1px 0 rgba(255,255,255,0.15),
+        -1px -1px 0 rgba(255,255,255,0.1);
+}
+
+/* ===== JEU ===== */
 #game {
-    font-size: 48px;
+    font-size: 52px;
+    letter-spacing: 2px;
 }
 
+/* ===== RÉPONSE STYLE CRAIE ===== */
 #answer {
-    font-size: 48px;
+    font-size: 52px;
     width: 140px;
     border: none;
-    border-bottom: 3px solid black;
+    border-bottom: 3px dashed #f5f5f5;
     background: transparent;
     text-align: center;
     outline: none;
+    color: #f5f5f5;
 }
 
+/* ===== FORM ===== */
 input, select {
     font-size: 18px;
     padding: 8px;
     margin: 8px;
+    border-radius: 6px;
+    border: none;
 }
 
+/* ===== BOUTONS ===== */
 button {
     margin-top: 20px;
     padding: 14px 30px;
     font-size: 22px;
     border: none;
     border-radius: 10px;
-    background: black;
+    background: #2c3e50;
     color: white;
 }
 
+/* ===== TABLEAU SCORES ===== */
 table {
     width: 100%;
     border-collapse: collapse;
-    background: #f9f9f9;
     margin-top: 15px;
+    background: rgba(0,0,0,0.65);
+    color: #f5f5f5;
+    border-radius: 14px;
+    overflow: hidden;
+}
+
+th {
+    background: #1c2833;
 }
 
 th, td {
-    border: 1px solid #ccc;
-    padding: 8px;
+    padding: 10px;
+    border-bottom: 1px solid rgba(255,255,255,0.2);
 }
 
-.good { color: green; }
-.bad { color: red; }
+.good { color: #2ecc71; }
+.bad { color: #e74c3c; }
+
 </style>
 </head>
-    
-/* ===== EFFET CRAIE ===== */
-#game,
-#question,
-#finalScore,
-#top {
-    color: #f5f5f5;
-    text-shadow:
-        1px 1px 0 rgba(255,255,255,0.15),
-        -1px -1px 0 rgba(255,255,255,0.1);
+
 <body>
 
 <!-- BARRE HAUTE -->
@@ -157,7 +184,6 @@ let timer = null;
 let resultLength = 0;
 let scoreSaved = false;
 
-// Elements
 const topBar = document.getElementById("top");
 const startScreen = document.getElementById("startScreen");
 const gameScreen = document.getElementById("gameScreen");
@@ -174,7 +200,6 @@ const tableEl = document.getElementById("scoreTable");
 const saveZone = document.getElementById("saveZone");
 const savedMessage = document.getElementById("savedMessage");
 
-// Buttons
 document.getElementById("startBtn").onclick = startGame;
 document.getElementById("saveBtn").onclick = saveScore;
 document.getElementById("restartBtn").onclick = goHome;
@@ -253,7 +278,7 @@ function saveScore() {
     } else {
         scores.push({
             name: nameEl.value,
-            score: score,
+            score,
             level: difficultyEl.value,
             date: new Date().toLocaleDateString()
         });
@@ -311,7 +336,6 @@ answerEl.addEventListener("input", () => {
     }
 });
 
-// INIT
 show(startScreen);
 renderTable();
 </script>
